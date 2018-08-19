@@ -1,0 +1,34 @@
+{
+  "name": "os-lock",
+  "version": "1.0.0",
+  "description": "Cross-platform file locking/unlocking",
+  "main": "index.js",
+  "files": [
+    "binding.gyp",
+    "index.d.ts",
+    "index.js",
+    "lock.c",
+    "lock.h",
+    "os-lock.cc"
+  ],
+  "scripts": {
+    "test": "node test",
+    "install": "node-gyp rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohd-akram/os-lock.git"
+  },
+  "keywords": [
+    "os",
+    "file",
+    "lock"
+  ],
+  "author": "Mohamed Akram",
+  "license": "MIT",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/mohd-akram/os-lock/issues"
+  },
+  "homepage": "https://github.com/mohd-akram/os-lock#readme"
+}
