@@ -2,11 +2,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#ifdef _get_osfhandle
-intptr_t _get_osfhandle(int);
-#else
 #include <io.h>
-#endif
 #else
 #include <errno.h>
 #include <fcntl.h>
