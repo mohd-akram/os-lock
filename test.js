@@ -70,6 +70,8 @@ async function worker() {
   cluster.worker.disconnect();
 }
 
+process.on('unhandledRejection', err => { throw err; });
+
 if (cluster.isMaster)
   master();
 else
