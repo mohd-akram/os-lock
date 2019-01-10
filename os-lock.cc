@@ -6,10 +6,13 @@
 namespace OSLock {
 using node::AsyncResource;
 using node::UVException;
+using v8::Boolean;
 using v8::Exception;
 using v8::Function;
 using v8::FunctionCallbackInfo;
 using v8::HandleScope;
+using v8::Int32;
+using v8::Integer;
 using v8::Isolate;
 using v8::Local;
 using v8::Object;
@@ -77,11 +80,11 @@ void LockAsync(const FunctionCallbackInfo<Value>& args) {
 
   LockWork* work = new LockWork();
 
-  work->fd = args[0]->Int32Value();
-  work->start = args[1]->IntegerValue();
-  work->length = args[2]->IntegerValue();
-  work->exclusive = args[3]->BooleanValue();
-  work->immediate = args[4]->BooleanValue();
+  work->fd = args[0].As<Int32>()->Value();
+  work->start = args[1].As<Integer>()->Value();
+  work->length = args[2].As<Integer>()->Value();
+  work->exclusive = args[3].As<Boolean>()->Value();
+  work->immediate = args[4].As<Boolean>()->Value();
 
   Local<Function> callback = args[5].As<Function>();
   work->cb.Reset(isolate, callback);
@@ -103,9 +106,9 @@ void UnlockAsync(const FunctionCallbackInfo<Value>& args) {
 
   LockWork* work = new LockWork();
 
-  work->fd = args[0]->Int32Value();
-  work->start = args[1]->IntegerValue();
-  work->length = args[2]->IntegerValue();
+  work->fd = args[0].As<Int32>()->Value();
+  work->start = args[1].As<Integer>()->Value();
+  work->length = args[2].As<Integer>()->Value();
 
   Local<Function> callback = args[3].As<Function>();
   work->cb.Reset(isolate, callback);
