@@ -1,6 +1,6 @@
 {
   "name": "os-lock",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Cross-platform file locking/unlocking",
   "main": "index.js",
   "files": [
