@@ -15,6 +15,7 @@ using v8::Int32;
 using v8::Integer;
 using v8::Isolate;
 using v8::Local;
+using v8::NewStringType;
 using v8::Object;
 using v8::Persistent;
 using v8::String;
@@ -73,7 +74,9 @@ void LockAsync(const FunctionCallbackInfo<Value>& args) {
 
   if (args.Length() != 6) {
     isolate->ThrowException(Exception::TypeError(
-      String::NewFromUtf8(isolate, "Wrong number of arguments")
+      String::NewFromUtf8(
+        isolate, "Wrong number of arguments", NewStringType::kNormal
+      ).ToLocalChecked()
     ));
     return;
   }
@@ -99,7 +102,9 @@ void UnlockAsync(const FunctionCallbackInfo<Value>& args) {
 
   if (args.Length() != 4) {
     isolate->ThrowException(Exception::TypeError(
-      String::NewFromUtf8(isolate, "Wrong number of arguments")
+      String::NewFromUtf8(
+        isolate, "Wrong number of arguments", NewStringType::kNormal
+      ).ToLocalChecked()
     ));
     return;
   }
