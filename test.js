@@ -1,17 +1,12 @@
 const assert = require('assert');
 const cluster = require('cluster');
-const fs = require('fs');
-const util = require('util');
-
-const fsOpen = util.promisify(fs.open);
-const fsClose = util.promisify(fs.close);
-const fsUnlink = util.promisify(fs.unlink);
+const fs = require('fs/promises');
 
 const { lock, unlock } = require('.');
 
 async function removeFile(filename) {
   try {
-    await fsUnlink(filename);
+    await fs.unlink(filename);
   } catch (e) {
     if (e.code != 'ENOENT')
       throw e;
@@ -22,13 +17,14 @@ const filename = 'file';
 
 async function single() {
   try {
-    const fd = await fsOpen(filename, 'wx');
+    const file = await fs.open(filename, 'wx');
+    const { fd } = file;
 
     // Basic test
     await assert.doesNotReject(lock(fd, { exclusive: true }));
     await assert.doesNotReject(unlock(fd));
 
-    await fsClose(fd);
+    await file.close();
     // Cannot lock closed file
     await assert.rejects(lock(fd), { code: 'EBADF' });
     // Cannot unlock closed file
@@ -43,7 +39,8 @@ async function single() {
 async function master() {
   await single();
 
-  const fd = await fsOpen(filename, 'wx');
+  const file = await fs.open(filename, 'wx');
+  const { fd } = file;
 
   // Get an exclusive lock
   assert.doesNotReject(lock(fd, { exclusive: true }));
@@ -51,7 +48,7 @@ async function master() {
   // Pretend to do work and unlock the file after 1 second
   setTimeout(async () => {
     await assert.doesNotReject(unlock(fd));
-    await fsClose(fd);
+    await file.close();
   }, 1000);
   worker.on('disconnect', async () => {
     await removeFile(filename);
@@ -60,13 +57,14 @@ async function master() {
 }
 
 async function worker() {
-  const fd = await fsOpen(filename, 'r+');
+  const file = await fs.open(filename, 'r+');
+  const { fd } = file;
   await assert.rejects(
     lock(fd, { immediate: true }), { code: /^(EACCES|EAGAIN|EBUSY)$/ }
   );
   await assert.doesNotReject(lock(fd));
   await assert.doesNotReject(unlock(fd));
-  await fsClose(fd);
+  await file.close();
   cluster.worker.disconnect();
 }
 

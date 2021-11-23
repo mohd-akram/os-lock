@@ -9,11 +9,12 @@
     "index.js",
     "lock.c",
     "lock.h",
-    "os-lock.cc"
+    "addon.c",
+    "addon.h",
+    "addon-node.c"
   ],
   "scripts": {
-    "test": "node test",
-    "install": "node-gyp rebuild"
+    "test": "node test"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,6 @@
   ],
   "author": "Mohamed Akram",
   "license": "MIT",
-  "gypfile": true,
   "bugs": {
     "url": "https://github.com/mohd-akram/os-lock/issues"
   },

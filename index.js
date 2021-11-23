@@ -7,14 +7,13 @@ const _unlock = util.promisify(addon.unlock);
 
 function lock(
   fd, startOrOptions, length = 0,
-  options = { exclusive: false, immediate: false }
+  { exclusive = false, immediate = false } = {}
 ) {
   let start = 0;
   if (typeof startOrOptions == 'number')
     start = startOrOptions;
   else if (startOrOptions)
-    options = startOrOptions;
-  const { exclusive, immediate } = options;
+    ({ exclusive, immediate } = { exclusive, immediate, ...startOrOptions });
   return _lock(fd, start, length, exclusive, immediate);
 }
 
