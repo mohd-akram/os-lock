@@ -19,8 +19,8 @@
 					? "empty error message"			\
 					: err_message;				\
 				napi_throw_error((env), NULL, message);		\
-				return NULL;					\
 			}							\
+			return NULL;						\
 		}								\
 	} while(0)
 
