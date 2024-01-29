@@ -11,15 +11,15 @@ Cross-platform file locking. Uses `fcntl` on UNIX and
 
 ### Synopsis
 
-```javascript
-await lock(fd, options);
-await lock(
+```typescript
+async function lock(fd, options);
+async function lock(
   fd,
-  (start = 0),
-  (length = 0),
-  (options = { exclusive: false, immediate: false })
+  start = 0,
+  length = 0,
+  options = { exclusive: false, immediate: false }
 );
-await unlock(fd, (start = 0), (length = 0));
+async function unlock(fd, start = 0, length = 0);
 ```
 
 ### Arguments
@@ -36,51 +36,46 @@ An error thrown due to `immediate` will have its `code` property set to
 ### Example
 
 ```javascript
-const cluster = require("cluster");
-const fs = require("fs");
-const util = require("util");
+import cluster from "cluster";
+import fs from "fs/promises";
 
-const { lock, unlock } = require("os-lock");
-
-const fsOpen = util.promisify(fs.open);
-const fsClose = util.promisify(fs.close);
-const fsUnlink = util.promisify(fs.unlink);
+import { lock, unlock } from "os-lock";
 
 const filename = "file";
 
-async function master() {
-  const fd = await fsOpen(filename, "wx");
+async function primary() {
+  const file = await fs.open(filename, "wx");
   // Get an exclusive lock
-  await lock(fd, { exclusive: true });
+  await lock(file.fd, { exclusive: true });
   // Fork a new process which will attempt to get a lock for itself
   // (see the worker() function below)
   const worker = cluster.fork();
   // Pretend to do work and unlock the file after 3 seconds
   setTimeout(async () => {
-    await unlock(fd);
-    await fsClose(fd);
+    await unlock(file.fd);
+    await file.close();
   }, 3000);
   // Delete the file after the worker is done with it
-  worker.on("disconnect", async () => await fsUnlink(filename));
+  worker.on("disconnect", async () => await fs.unlink(filename));
 }
 
 async function worker() {
-  const fd = await fsOpen(filename, "r+");
+  const file = await fs.open(filename, "r+");
   console.time("got lock after");
   try {
     // Try (and fail) to get a lock immediately
-    await lock(fd, { immediate: true });
+    await lock(file.fd, { immediate: true });
   } catch (e) {
     if (!/^(EACCES|EAGAIN|EBUSY)$/.test(e.code)) throw e;
     console.warn("failed to get lock immediately");
   }
   // Try again, this time with patience
-  await lock(fd);
+  await lock(file.fd);
   console.timeEnd("got lock after");
-  await unlock(fd);
+  await unlock(file.fd);
   cluster.worker.disconnect();
 }
 
-if (cluster.isMaster) master();
+if (cluster.isPrimary) primary();
 else worker();
 ```

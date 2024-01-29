@@ -14,7 +14,7 @@
     "addon-node.c"
   ],
   "scripts": {
-    "test": "node test"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",
